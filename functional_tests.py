@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import unittest
+import time
 
 class NewVisitorTest(unittest.TestCase):
 
@@ -33,19 +34,32 @@ class NewVisitorTest(unittest.TestCase):
 
         # When she hits enter the page lists "1: Buy peacock feathers"
         inputbox.send_keys(Keys.ENTER)
+        time.sleep(1)
+
         table = self.browser.find_element_by_id('id_list_table')
         rows = table.find_elements_by_tag_name('tr')
-        self.assertTrue(
-            any(row.text == '1: Buy peacock feathers' for row in rows),
-            "New to-do item did not appear in table"
-        )
 
-        # There is still a textbox for another item. She types " Use peacock feathers to make a fly"
-        self.fail('Finish the test!')
+        self.assertIn('1: Buy peacock feathers', [row.text for row in rows])
+
+        # There is still a textbox for another item. She types "Use peacock feathers to make a fly"
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox.send_keys('Use peacock feathers to make a fly')
+        inputbox.send_keys(Keys.ENTER)
+        time.sleep(1)
 
         # The page updates again and shows both items
+        table = self.browser.find_element_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertIn('1: Buy peacock feathers', [row.text for row in rows])
+        self.assertIn(
+            '2: Use peacock feathers to make a fly',
+            [row.text for row in rows]
+        )
+
+
 
         # She sees that the page has generated a unique URL for her and explanatory text.
+        self.fail('Finish the test!')
 
         # She visits the URL and her list is still There
 
